@@ -1,227 +1,775 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>우리반 학급 게시판</title>
-  <style>
-    /* 기본 스타일 초기화 */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    }
-
-    body {
-      background-color: #f4f7f6;
-      color: #333;
-      padding: 20px;
-    }
-
-    /* 상단 헤더 */
-    header {
-      background: linear-gradient(135deg, #74ebe5, #89f7fe);
-      border-radius: 16px;
-      padding: 24px;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-      margin-bottom: 24px;
-    }
-
-    header h1 {
-      font-size: 1.8rem;
-      color: #1a365d;
-      margin-bottom: 8px;
-    }
-
-    header p {
-      font-size: 1rem;
-      color: #2b6cb0;
-    }
-
-    /* 메인 그리드 레이아웃 */
-    .container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 20px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    /* 카드 공통 스타일 */
-    .card {
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
-      border: 1px solid #e2e8f0;
-    }
-
-    .card h2 {
-      font-size: 1.25rem;
-      color: #2d3748;
-      margin-bottom: 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-bottom: 2px solid #edf2f7;
-      padding-bottom: 8px;
-    }
-
-    /* 알림장 & 공지사항 리스트 */
-    .notice-list {
-      list-style: none;
-    }
-
-    .notice-list li {
-      padding: 10px 0;
-      border-bottom: 1px dashed #e2e8f0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .notice-list li:last-child {
-      border-bottom: none;
-    }
-
-    .tag {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 12px;
-      font-weight: bold;
-    }
-
-    .tag.important { background-color: #fed7d7; color: #9b2c2c; }
-    .tag.normal { background-color: #e2e8f0; color: #4a5568; }
-
-    /* 시간표 테이블 */
-    .timetable {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: center;
-    }
-
-    .timetable th, .timetable td {
-      padding: 8px;
-      border: 1px solid #edf2f7;
-      font-size: 0.9rem;
-    }
-
-    .timetable th {
-      background-color: #ebf8ff;
-      color: #2b6cb0;
-    }
-
-    /* 학급 갤러리/활동 영억 */
-    .gallery-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-    }
-
-    .gallery-item {
-      background-color: #edf2f7;
-      border-radius: 8px;
-      height: 100px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #a0aec0;
-      font-size: 0.85rem;
-    }
-
-    /* 하단 푸터 */
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #a0aec0;
-      font-size: 0.85rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>디지털 시민성(Digital Citizenship) 퀴즈</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti for victory effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card-interactive {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card-interactive:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.3);
+            border-color: rgba(129, 140, 248, 0.4);
+        }
+        .pulse-glow {
+            animation: pulseGlow 3s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
+            100% { box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(99, 102, 241, 0.5);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(129, 140, 248, 0.8);
+        }
+    </style>
 </head>
-<body>
+<body class="text-slate-100 flex flex-col justify-between min-h-screen">
 
-  <!-- 헤더 영역 -->
-  <header>
-    <h1>📢 행복한 우리반 게시판</h1>
-    <p>오늘의 날짜: <span id="current-date">2026년 8월 8일</span> | 학급 슬로건: "서로 존중하고 함께 성장하자!"</p>
-  </header>
+    <!-- Header Navigation -->
+    <header class="w-full border-b border-slate-800/80 glass-card sticky top-0 z-50 px-4 py-3">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3 cursor-pointer" onclick="resetToHome()">
+                <div class="p-2 bg-indigo-600/30 rounded-xl border border-indigo-500/30 text-indigo-400">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg leading-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400">
+                        디지털 시민성 Test
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Digital Citizenship Assessment</p>
+                </div>
+            </div>
+            <div id="header-status" class="hidden flex items-center gap-4 text-sm">
+                <span class="bg-indigo-950/80 border border-indigo-800/50 text-indigo-300 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1.5">
+                    <i data-lucide="help-circle" class="w-3.5 h-3.5"></i>
+                    <span id="current-progress-text">1 / 10</span>
+                </span>
+            </div>
+        </div>
+    </header>
 
-  <!-- 메인 콘텐츠 영역 -->
-  <main class="container">
+    <!-- Main Content Container -->
+    <main class="flex-grow flex items-center justify-center p-4 sm:p-6 md:p-8">
+        <div class="w-full max-w-3xl mx-auto">
 
-    <!-- 1. 알림장 -->
-    <section class="card">
-      <h2>📌 오늘의 알림장</h2>
-      <ul class="notice-list">
-        <li>
-          <span>준비물: 미술 시간에 쓸 개인 수채화 물감</span>
-          <span class="tag important">중요</span>
-        </li>
-        <li>
-          <span>내일 독서록 제출일입니다.</span>
-          <span class="tag normal">알림</span>
-        </li>
-        <li>
-          <span>우산 가져가기 (오후 비 소식)</span>
-          <span class="tag normal">참고</span>
-        </li>
-      </ul>
-    </section>
+            <!-- 1. START SCREEN (학생 정보 입력 및 시작) -->
+            <div id="start-screen" class="glass-card rounded-3xl p-6 sm:p-10 text-center pulse-glow border border-indigo-500/20 shadow-2xl relative overflow-hidden">
+                <div class="absolute -top-24 -right-24 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -bottom-24 -left-24 w-60 h-60 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <!-- 2. 주간 시간표 -->
-    <section class="card">
-      <h2>🗓️ 오늘의 시간표</h2>
-      <table class="timetable">
-        <thead>
-          <tr>
-            <th>교시</th>
-            <th>과목</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr><td>1교시</td><td>국어</td></tr>
-          <tr><td>2교시</td><td>수학</td></tr>
-          <tr><td>3교시</td><td>사회</td></tr>
-          <tr><td>4교시</td><td>과학</td></tr>
-          <tr><td>5교시</td><td>체육</td></tr>
-        </tbody>
-      </table>
-    </section>
+                <div class="inline-flex p-4 rounded-2xl bg-gradient-to-tr from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 mb-4 text-indigo-400">
+                    <i data-lucide="globe" class="w-12 h-12"></i>
+                </div>
 
-    <!-- 3. 주요 일정 -->
-    <section class="card">
-      <h2>📅 이번 달 주요 일정</h2>
-      <ul class="notice-list">
-        <li>
-          <span>8월 12일: 학급 회장 선거</span>
-          <span class="tag normal">일정</span>
-        </li>
-        <li>
-          <span>8월 20일: 현장체험학습</span>
-          <span class="tag important">행사</span>
-        </li>
-      </ul>
-    </section>
+                <h2 class="text-2xl sm:text-3xl font-extrabold mb-2 text-white tracking-tight">
+                    나는 올바른 <span class="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-pink-400">디지털 시민</span>일까요?
+                </h2>
+                
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mx-auto mb-6">
+                    인터넷 세상 속 나의 디지털 리터러시와 윤리 의식을 진단해보세요.
+                </p>
 
-    <!-- 4. 우리들의 추억 (사진 게시판) -->
-    <section class="card">
-      <h2>🖼️ 학급 갤러리</h2>
-      <div class="gallery-grid">
-        <div class="gallery-item">사진 1</div>
-        <div class="gallery-item">사진 2</div>
-        <div class="gallery-item">사진 3</div>
-        <div class="gallery-item">사진 4</div>
-      </div>
-    </section>
+                <!-- Student Info Input Form -->
+                <div class="bg-slate-900/60 p-5 rounded-2xl border border-slate-800 mb-6 max-w-md mx-auto text-left">
+                    <h3 class="text-xs font-bold text-indigo-300 mb-3 flex items-center gap-1.5">
+                        <i data-lucide="user-check" class="w-4 h-4"></i> 응시자 정보 입력
+                    </h3>
+                    <div class="grid grid-cols-3 gap-3 mb-3">
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">학년</label>
+                            <input type="text" id="student-grade" placeholder="예: 6" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">반</label>
+                            <input type="text" id="student-class" placeholder="예: 3" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] text-slate-400 mb-1">번호</label>
+                            <input type="text" id="student-number" placeholder="예: 15" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-400 mb-1">이름</label>
+                        <input type="text" id="student-name" placeholder="예: 홍길동" class="w-full px-3 py-2 bg-slate-800 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
 
-  </main>
+                <button onclick="startQuiz()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-500 hover:to-pink-500 text-white font-bold text-lg rounded-2xl shadow-lg shadow-indigo-500/25 transition-all transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 mx-auto">
+                    <span>퀴즈 시작하기</span>
+                    <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
+            </div>
 
-  <footer>
-    <p>© 2026 우리반 학급 게시판 | 문의: 담임교사</p>
-  </footer>
+            <!-- 2. QUIZ SCREEN -->
+            <div id="quiz-screen" class="hidden flex-col gap-4">
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-800/80 rounded-full h-2.5 overflow-hidden border border-slate-700/50">
+                    <div id="progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 h-2.5 rounded-full transition-all duration-300" style="width: 10%"></div>
+                </div>
 
+                <!-- Main Question Card -->
+                <div class="glass-card rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-700/60 relative">
+                    <!-- Category Badge & Count -->
+                    <div class="flex justify-between items-center mb-4">
+                        <span id="question-category" class="px-3 py-1 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-bold rounded-full flex items-center gap-1.5">
+                            <i data-lucide="tag" class="w-3.5 h-3.5"></i>
+                            카테고리
+                        </span>
+                        <span id="question-number" class="text-xs font-semibold text-slate-400">
+                            문제 1 / 10
+                        </span>
+                    </div>
+
+                    <!-- Question Text -->
+                    <h3 id="question-text" class="text-lg sm:text-xl font-bold text-slate-100 mb-6 leading-snug">
+                        질문 내용이 여기에 들어갑니다.
+                    </h3>
+
+                    <!-- Options Container -->
+                    <div id="options-container" class="space-y-3">
+                        <!-- Dynamic Options will be inserted here -->
+                    </div>
+
+                    <!-- Explanation Area (Initially Hidden) -->
+                    <div id="explanation-box" class="hidden mt-6 p-4 rounded-2xl bg-slate-900/80 border border-slate-700/80 animate-fadeIn">
+                        <div class="flex items-center gap-2 font-bold mb-2 text-sm" id="explanation-title">
+                            <i id="explanation-icon" data-lucide="info" class="w-4 h-4"></i>
+                            <span>해설</span>
+                        </div>
+                        <p id="explanation-text" class="text-sm text-slate-300 leading-relaxed">
+                            정답 해설 내용입니다.
+                        </p>
+                    </div>
+
+                    <!-- Next Button Bar -->
+                    <div class="mt-6 flex justify-end">
+                        <button id="next-btn" onclick="nextQuestion()" disabled class="px-6 py-3 bg-slate-700 text-slate-400 font-semibold text-sm rounded-xl transition-all flex items-center gap-2 cursor-not-allowed">
+                            <span>다음 문제</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. RESULT SCREEN -->
+            <div id="result-screen" class="hidden glass-card rounded-3xl p-6 sm:p-10 text-center border border-slate-700/80 shadow-2xl">
+                <div class="inline-flex p-4 rounded-full bg-indigo-500/20 border border-indigo-500/30 text-indigo-400 mb-4">
+                    <i data-lucide="award" class="w-12 h-12"></i>
+                </div>
+
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-white mb-1">퀴즈 결과 분석</h2>
+                <p id="result-student-info" class="text-indigo-300 text-sm font-semibold mb-4"></p>
+
+                <!-- Score Box -->
+                <div class="bg-slate-900/60 rounded-2xl p-6 border border-slate-800 mb-6 max-w-md mx-auto">
+                    <div class="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-pink-400 mb-2" id="score-display">
+                        80 <span class="text-2xl text-slate-400 font-normal">/ 100점</span>
+                    </div>
+                    <div id="score-badge" class="inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        모범적인 디지털 시민
+                    </div>
+                    <p id="result-summary" class="text-sm text-slate-300 leading-relaxed mb-3">
+                        디지털 환경에 대한 높은 이해도와 윤리의식을 가지고 계시네요!
+                    </p>
+                    <!-- Spreadsheet save status message -->
+                    <div id="save-status" class="text-xs text-slate-400 bg-slate-800/50 py-2 px-3 rounded-lg border border-slate-700/50">
+                        스프레드시트에 결과를 전송하는 중...
+                    </div>
+                </div>
+
+                <!-- Category Breakdown -->
+                <div class="mb-8 text-left">
+                    <h4 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-1.5">
+                        <i data-lucide="bar-chart-2" class="w-4 h-4 text-indigo-400"></i>
+                        분야별 결과 분석
+                    </h4>
+                    <div id="category-stats" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <!-- Dynamic Category Stats -->
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-col sm:flex-row gap-3 justify-center">
+                    <button onclick="toggleReviewMode()" class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-sm rounded-xl border border-slate-700 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="file-search" class="w-4 h-4"></i>
+                        <span>오답 및 해설 다시보기</span>
+                    </button>
+                    <button onclick="resetToHome()" class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/20 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="rotate-ccw" class="w-4 h-4"></i>
+                        <span>처음으로 돌아가기</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. REVIEW MODE SCREEN -->
+            <div id="review-screen" class="hidden flex-col gap-4">
+                <div class="flex justify-between items-center glass-card p-4 rounded-2xl border border-slate-700/80">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="check-circle-2" class="w-5 h-5 text-indigo-400"></i>
+                        <h3 class="font-bold text-slate-100">전체 문제 복습 및 해설</h3>
+                    </div>
+                    <button onclick="backToResult()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 rounded-lg border border-slate-700 transition">
+                        결과로 돌아가기
+                    </button>
+                </div>
+
+                <!-- Review Items Container -->
+                <div id="review-list" class="space-y-4">
+                    <!-- Dynamic Review Cards -->
+                </div>
+
+                <div class="text-center py-4">
+                    <button onclick="resetToHome()" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl shadow-lg transition">
+                        처음으로 돌아가기
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="w-full text-center py-4 text-xs text-slate-500 border-t border-slate-800/60 glass-card mt-8">
+        <p>© 2026 Digital Citizenship Education. 안전하고 올바른 디지털 문화를 만들어갑니다.</p>
+    </footer>
+
+    <!-- JavaScript Quiz Logic -->
+    <script>
+        // 📌 [설정 안내] 구글 앱스 스크립트 웹 앱(Web App) 배포 후 생성된 URL을 아래 변수에 입력하세요.
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBnB3RBacRAg_nZIZdNmGN1uAsQoeztpZs-hqiYRVEL3qROdoEnuzj4eg5fURtUsRm/exec";
+
+        // 퀴즈 데이터베이스 (10문항)[cite: 1]
+        const quizData = [
+            {
+                id: 1,
+                category: "디지털 보안",
+                question: "타인이 추측하기 어렵고 강력한 비밀번호를 생성하는 가장 올바른 방법은 무엇일까요?",
+                options: [
+                    "자신의 생년월일이나 전화번호를 사용한다.",
+                    "영문 대소문자, 숫자, 특수문자를 조합하여 12자리 이상으로 만든다.",
+                    "기억하기 쉽게 '123456'이나 'password'로 설정한다.",
+                    "모든 사이트에서 동일한 비밀번호를 똑같이 사용한다."
+                ],
+                correct: 1,
+                explanation: "강력한 비밀번호는 대소문자, 숫자, 특수문자를 혼합하여 최소 10~12자 이상으로 구성해야 하며, 사이트마다 다르게 설정하는 것이 안전합니다."
+            },
+            {
+                id: 2,
+                category: "저작권 윤리",
+                question: "인터넷에서 발견한 타인의 그림이나 사진을 블로그나 SNS에 사용할 때 올바른 행동은?",
+                options: [
+                    "출처만 밝히면 저작권자의 허락 없이 무조건 사용해도 된다.",
+                    "상업적 이용이 아니므로 아무런 허락 없이 자유롭게 게시한다.",
+                    "CCL(저작자표시 라이선스) 조건을 확인하거나 원작자의 사용 허락을 받는다.",
+                    "이미지의 일부분만 잘라내어 편집하면 문제없이 사용할 수 있다."
+                ],
+                correct: 2,
+                explanation: "출처를 표기하더라도 원작자의 허가 없이 사용하는 것은 저작권 침해가 될 수 있습니다. 저작물의 라이선스(CCL 등) 조건을 정확히 확인하고 이용해야 합니다."
+            },
+            {
+                id: 3,
+                category: "개인정보 보호",
+                question: "공공장소(카페, 도서관 등)의 오픈 Wi-Fi를 사용할 때 가장 경계해야 할 위험 요소는?",
+                options: [
+                    "인터넷 연결 속도가 느려질 수 있다.",
+                    "네트워크 해킹을 통한 개인정보 및 로그인 데이터 탈취 위험이 있다.",
+                    "스마트폰 배터리가 평소보다 더 빠르게 소모된다.",
+                    "공공 Wi-Fi 접속 시 추가 요금이 발생한다."
+                ],
+                correct: 1,
+                explanation: "암호화되지 않은 공공 Wi-Fi는 데이터 패킷을 감청(스니핑)당하기 쉽습니다. 금융 거래나 중요한 개인정보 입력은 자제하고 VPN을 활용하는 것이 좋습니다."
+            },
+            {
+                id: 4,
+                category: "가짜뉴스 판별",
+                question: "SNS에서 자극적인 헤드라인의 뉴스 기사를 보았을 때 올바른 대응 자세는?",
+                options: [
+                    "신기한 정보이므로 친구들에게 즉시 공유한다.",
+                    "헤드라인만 읽고 사실로 받아들인다.",
+                    "언론사 출처, 작성자, 작성 일자 및 타 공식 언론의 교차 보도 여부를 확인한다.",
+                    "댓글에 다른 사람들의 반응이 좋으면 무조건 진실로 믿는다."
+                ],
+                correct: 2,
+                explanation: "허위정보(가짜뉴스)의 확산을 막기 위해서는 정보의 출처, 근거 자료, 작성 일자, 타 매체의 교차 검증 여부를 반드시 확인해야 합니다."
+            },
+            {
+                id: 5,
+                category: "넷티켓",
+                question: "온라인 커뮤니티나 게임 채팅 중 의견이 다른 상대방을 접했을 때 올바른 태도는?",
+                options: [
+                    "상대방의 의견을 비하하고 인신공격을 한다.",
+                    "서로의 차이를 인정하고 예의를 지키며 논리적으로 의견을 전달한다.",
+                    "다수의 인원을 동원하여 상대방에게 사이버 불링(Cyberbullying)을 가한다.",
+                    "상대방의 개인정보를 수집하여 외부에 유출한다."
+                ],
+                correct: 1,
+                explanation: "온라인 공간에서도 익명성 뒤에 사람이 있음을 기억하고, 존중과 예의(Netiquette)를 지켜 대화해야 합니다."
+            },
+            {
+                id: 6,
+                category: "디지털 리터러시",
+                question: "스마트폰 앱을 설치할 때 '접근 권한 요청' 화면에서 확인해야 할 사항은?",
+                options: [
+                    "앱의 기능과 상관없는 과도한 권한(위치, 연락처, 카메라 등) 요청이 있는지 확인한다.",
+                    "시간 절약을 위해 모두 '허용'을 누르고 빠르게 넘어간다.",
+                    "접근 권한은 보안과 아무런 관련이 없으므로 무시한다.",
+                    "무조건 모든 접근 권한을 거부하면 앱 실행이 안 되므로 항상 '동의'한다."
+                ],
+                correct: 0,
+                explanation: "간단한 플래시 라이트 앱이 '연락처'나 '위치 정보'를 요구하는 등 기능과 무관한 과도한 권한을 요구한다면 개인정보 유출을 의심해야 합니다."
+            },
+            {
+                id: 7,
+                category: "디지털 보안",
+                question: "출처가 불분명한 문자 메시지로 전달된 '택배 배송 조회' 링크(URL)를 받았을 때 행동은?",
+                options: [
+                    "궁금하므로 즉시 링크를 클릭하여 확인한다.",
+                    "스미싱(Smishing) 의심 링크이므로 클릭하지 않고 즉시 삭제하거나 신고한다.",
+                    "링크를 클릭한 후 요구하는 앱을 다운로드하여 설치해본다.",
+                    "친구들에게 동일한 문자 메시지를 전달하여 문의한다."
+                ],
+                correct: 1,
+                explanation: "출처가 불분명한 문자 내 URL은 악성코드를 설치하는 스미싱일 확률이 높으므로 절대 클릭하지 않고 삭제해야 합니다."
+            },
+            {
+                id: 8,
+                category: "디지털 웰빙",
+                question: "바람직한 '디지털 웰빙(Digital Wellbeing)'을 실천하는 방법으로 적절한 것은?",
+                options: [
+                    "취침 직전까지 스마트폰 화면을 계속 시청한다.",
+                    "스마트폰 사용 시간 제한을 설정하고, 디지털 기기와 떨어져 휴식하는 시간을 갖는다.",
+                    "알림이 올 때마다 하던 일을 즉시 중단하고 스마트폰을 확인한다.",
+                    "식사 시간에도 항상 한 손으로 스마트폰을 사용한다."
+                ],
+                correct: 1,
+                explanation: "디지털 웰빙은 기기 사용을 주도적으로 조절하여 건강한 일상과의 균형을 유지하는 삶의 태도를 의미합니다."
+            },
+            {
+                id: 9,
+                category: "저작권 윤리",
+                question: "생성형 AI(예: ChatGPT, Midjourney 등)를 활용하여 과제나 콘텐츠를 만들 때 유의할 점은?",
+                options: [
+                    "AI가 생성한 결과물은 항상 100% 사실이므로 검증 없이 그대로 제출한다.",
+                    "AI 결과물의 환각(Hallucination) 현상과 저작권 침해 여부를 교차 검증하고 출처를 명시한다.",
+                    "타인의 AI 생성물을 자신이 직접 만든 것처럼 속여 사용한다.",
+                    "AI 생성물에는 저작권이나 윤리적 고려가 전혀 필요 없다."
+                ],
+                correct: 1,
+                explanation: "생성형 AI의 출력물은 거짓 정보를 사실처럼 말하는 환각 현상이 발생할 수 있으며, 기존 학습 데이터의 저작권을 침해할 가능성이 있어 검증이 필수적입니다."
+            },
+            {
+                id: 10,
+                category: "디지털 잊혀질 권리",
+                question: "'디지털 발자국(Digital Footprint)'에 대한 설명으로 가장 올바른 것은?",
+                options: [
+                    "인터넷을 사용해도 내가 남긴 정보는 일정 시간이 지나면 자동으로 완전히 삭제된다.",
+                    "온라인에 작성한 게시물, 댓글, 검색 기록 등 내가 남긴 디지털 흔적은 영구히 남을 수 있다.",
+                    "디지털 발자국은 타인에게 아무런 영향을 미치지 않는다.",
+                    "비공개 계정으로 올린 글은 인터넷상에서 완벽하게 안전하다."
+                ],
+                correct: 1,
+                explanation: "우리가 온라인에 남기는 모든 기록은 디지털 발자국이 되어 오랜 기간 남아 개인의 평판이나 보안에 영향을 줄 수 있으므로 신중하게 행동해야 합니다."
+            }
+        ];
+
+        // State variables
+        let studentInfo = { grade: '', classNum: '', number: '', name: '' };
+        let currentQuestionIndex = 0;
+        let userAnswers = [];
+        let isAnswered = false;
+
+        // DOM elements
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const reviewScreen = document.getElementById('review-screen');
+        const headerStatus = document.getElementById('header-status');
+
+        // Initialize Lucide Icons
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+        });
+
+        // Reset to Home
+        function resetToHome() {
+            document.getElementById('student-grade').value = '';
+            document.getElementById('student-class').value = '';
+            document.getElementById('student-number').value = '';
+            document.getElementById('student-name').value = '';
+
+            startScreen.classList.remove('hidden');
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.add('hidden');
+            headerStatus.classList.add('hidden');
+        }
+
+        // Start Quiz with validation
+        function startQuiz() {
+            const grade = document.getElementById('student-grade').value.trim();
+            const classNum = document.getElementById('student-class').value.trim();
+            const number = document.getElementById('student-number').value.trim();
+            const name = document.getElementById('student-name').value.trim();
+
+            if (!grade || !classNum || !number || !name) {
+                alert("학년, 반, 번호, 이름을 모두 입력해주세요!");
+                return;
+            }
+
+            studentInfo = { grade, classNum, number, name };
+            currentQuestionIndex = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            
+            startScreen.classList.add('hidden');
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('flex');
+            headerStatus.classList.remove('hidden');
+
+            renderQuestion();
+        }
+
+        // Render Current Question
+        function renderQuestion() {
+            isAnswered = false;
+            const q = quizData[currentQuestionIndex];
+
+            document.getElementById('current-progress-text').innerText = `${currentQuestionIndex + 1} / ${quizData.length}`;
+            document.getElementById('question-number').innerText = `문제 ${currentQuestionIndex + 1} / ${quizData.length}`;
+            document.getElementById('question-category').innerHTML = `<i data-lucide="tag" class="w-3.5 h-3.5"></i> ${q.category}`;
+            document.getElementById('question-text').innerText = q.question;
+
+            const progressPercent = ((currentQuestionIndex + 1) / quizData.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progressPercent}%`;
+
+            document.getElementById('explanation-box').classList.add('hidden');
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = true;
+            nextBtn.className = "px-6 py-3 bg-slate-800 text-slate-500 font-semibold text-sm rounded-xl border border-slate-700/50 flex items-center gap-2 cursor-not-allowed transition-all";
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = `w-full text-left p-4 rounded-xl glass-card glass-card-interactive border border-slate-700/70 text-slate-200 text-sm sm:text-base font-medium flex items-start gap-3 transition-all`;
+                btn.onclick = () => selectOption(idx);
+
+                btn.innerHTML = `
+                    <span class="inline-flex items-center justify-center w-6 h-6 rounded-full bg-slate-800 text-slate-400 border border-slate-700 text-xs font-bold shrink-0 mt-0.5 option-number">
+                        ${idx + 1}
+                    </span>
+                    <span class="flex-grow">${opt}</span>
+                    <span class="status-icon shrink-0"></span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Select Option
+        function selectOption(index) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            userAnswers[currentQuestionIndex] = index;
+            const q = quizData[currentQuestionIndex];
+            const isCorrect = (index === q.correct);
+
+            const optionsContainer = document.getElementById('options-container');
+            const buttons = optionsContainer.children;
+
+            for (let i = 0; i < buttons.length; i++) {
+                const btn = buttons[i];
+                btn.classList.remove('glass-card-interactive');
+                btn.onclick = null;
+
+                const statusIconSpan = btn.querySelector('.status-icon');
+                const numberSpan = btn.querySelector('.option-number');
+
+                if (i === q.correct) {
+                    btn.className = "w-full text-left p-4 rounded-xl bg-emerald-950/60 border-2 border-emerald-500 text-emerald-200 text-sm sm:text-base font-medium flex items-start gap-3 transition-all";
+                    numberSpan.className = "inline-flex items-center justify-center w-6 h-6 rounded-full bg-emerald-500 text-slate-950 text-xs font-bold shrink-0 mt-0.5";
+                    statusIconSpan.innerHTML = `<i data-lucide="check-circle" class="w-5 h-5 text-emerald-400"></i>`;
+                } else if (i === index) {
+                    btn.className = "w-full text-left p-4 rounded-xl bg-rose-950/60 border-2 border-rose-500 text-rose-200 text-sm sm:text-base font-medium flex items-start gap-3 transition-all";
+                    numberSpan.className = "inline-flex items-center justify-center w-6 h-6 rounded-full bg-rose-500 text-slate-950 text-xs font-bold shrink-0 mt-0.5";
+                    statusIconSpan.innerHTML = `<i data-lucide="x-circle" class="w-5 h-5 text-rose-400"></i>`;
+                } else {
+                    btn.className = "w-full text-left p-4 rounded-xl bg-slate-900/40 border border-slate-800 text-slate-500 text-sm sm:text-base font-medium flex items-start gap-3 opacity-50";
+                }
+            }
+
+            const explanationBox = document.getElementById('explanation-box');
+            const explanationTitle = document.getElementById('explanation-title');
+            const explanationText = document.getElementById('explanation-text');
+
+            if (isCorrect) {
+                explanationTitle.className = "flex items-center gap-2 font-bold mb-1 text-sm text-emerald-400";
+                explanationTitle.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4"></i> 정답입니다!`;
+            } else {
+                explanationTitle.className = "flex items-center gap-2 font-bold mb-1 text-sm text-rose-400";
+                explanationTitle.innerHTML = `<i data-lucide="alert-circle" class="w-4 h-4"></i> 오답입니다! (정답: ${q.correct + 1}번)`;
+            }
+            explanationText.innerText = q.explanation;
+            explanationBox.classList.remove('hidden');
+
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.disabled = false;
+            nextBtn.className = "px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-sm rounded-xl shadow-lg shadow-indigo-500/20 flex items-center gap-2 cursor-pointer transition-all transform hover:scale-105";
+            
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextBtn.querySelector('span').innerText = "결과 보기";
+            } else {
+                nextBtn.querySelector('span').innerText = "다음 문제";
+            }
+
+            lucide.createIcons();
+        }
+
+        // Next Question or Finish
+        function nextQuestion() {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        // Show Results Screen & Send Data to Google Sheet
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            quizScreen.classList.remove('flex');
+            resultScreen.classList.remove('hidden');
+
+            document.getElementById('result-student-info').innerText = 
+                `${studentInfo.grade}학년 ${studentInfo.classNum}반 ${studentInfo.number}번 ${studentInfo.name}`;
+
+            let correctCount = 0;
+            const categoryStats = {};
+
+            quizData.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = (userAns === q.correct);
+                
+                if (isCorrect) correctCount++;
+
+                if (!categoryStats[q.category]) {
+                    categoryStats[q.category] = { total: 0, correct: 0 };
+                }
+                categoryStats[q.category].total++;
+                if (isCorrect) categoryStats[q.category].correct++;
+            });
+
+            const score = (correctCount / quizData.length) * 100;
+
+            document.getElementById('score-display').innerHTML = `${score} <span class="text-2xl text-slate-400 font-normal">/ 100점</span>`;
+
+            const badge = document.getElementById('score-badge');
+            const summary = document.getElementById('result-summary');
+
+            if (score === 100) {
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 bg-indigo-500/20 text-indigo-300 border border-indigo-500/30";
+                badge.innerText = "🏆 완벽한 디지털 리더";
+                summary.innerText = "축하합니다! 디지털 시민성의 모든 영역에서 완벽한 지식을 갖추고 계십니다.";
+                triggerConfetti();
+            } else if (score >= 80) {
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 bg-emerald-500/20 text-emerald-300 border border-emerald-500/30";
+                badge.innerText = "🌟 모범적인 디지털 시민";
+                summary.innerText = "훌륭합니다! 안전하고 윤리적인 디지털 라이프를 잘 실천하고 계시네요.";
+                triggerConfetti();
+            } else if (score >= 60) {
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 bg-amber-500/20 text-amber-300 border border-amber-500/30";
+                badge.innerText = "🌱 성장하는 디지털 시민";
+                summary.innerText = "디지털 시민으로서의 기본적인 상식을 잘 갖추고 계십니다. 헷갈린 부분을 복습해보세요.";
+            } else {
+                badge.className = "inline-block px-4 py-1.5 rounded-full text-xs font-bold mb-3 bg-rose-500/20 text-rose-300 border border-rose-500/30";
+                badge.innerText = "⚠️ 학습이 필요한 디지털 탐험가";
+                summary.innerText = "온라인 안전과 윤리에 조금 더 관심이 필요합니다. 아래 해설을 통해 개념을 익혀보세요!";
+            }
+
+            // Render Category Breakdown
+            const categoryStatsContainer = document.getElementById('category-stats');
+            categoryStatsContainer.innerHTML = '';
+
+            for (const [cat, stat] of Object.entries(categoryStats)) {
+                const percent = Math.round((stat.correct / stat.total) * 100);
+                const statItem = document.createElement('div');
+                statItem.className = "p-3 rounded-xl bg-slate-900/50 border border-slate-800 flex justify-between items-center";
+                statItem.innerHTML = `
+                    <span class="text-slate-300 font-medium">${cat}</span>
+                    <span class="font-bold ${percent >= 80 ? 'text-emerald-400' : percent >= 50 ? 'text-amber-400' : 'text-rose-400'}">
+                        ${stat.correct} / ${stat.total} (${percent}%)
+                    </span>
+                `;
+                categoryStatsContainer.appendChild(statItem);
+            }
+
+            // Send Data to Google Sheets
+            sendDataToSheet(score, correctCount);
+
+            lucide.createIcons();
+        }
+
+        // Send Data to Google Apps Script Web App
+        function sendDataToSheet(score, correctCount) {
+            const statusDiv = document.getElementById('save-status');
+            
+            if (SCRIPT_URL === "YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE" || !SCRIPT_URL) {
+                statusDiv.innerHTML = "⚠️ SCRIPT_URL이 설정되지 않아 시트에 저장되지 않았습니다.";
+                statusDiv.className = "text-xs text-amber-400 bg-amber-950/40 py-2 px-3 rounded-lg border border-amber-800/50";
+                return;
+            }
+
+            const payload = {
+                timestamp: new Date().toLocaleString(),
+                grade: studentInfo.grade,
+                classNum: studentInfo.classNum,
+                number: studentInfo.number,
+                name: studentInfo.name,
+                score: score,
+                correctCount: correctCount,
+                totalQuestions: quizData.length,
+                answers: userAnswers.map(ans => ans !== null ? ans + 1 : '미응답').join(', ')
+            };
+
+            fetch(SCRIPT_URL, {
+                method: "POST",
+                mode: "no-cors", // 구글 앱스 스크립트 CORS 우회용
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(() => {
+                statusDiv.innerHTML = "✅ 구글 스프레드시트에 결과가 성공적으로 저장되었습니다!";
+                statusDiv.className = "text-xs text-emerald-400 bg-emerald-950/40 py-2 px-3 rounded-lg border border-emerald-800/50";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                statusDiv.innerHTML = "❌ 결과 저장 중 오류가 발생했습니다.";
+                statusDiv.className = "text-xs text-rose-400 bg-rose-950/40 py-2 px-3 rounded-lg border border-rose-800/50";
+            });
+        }
+
+        // Toggle Review Mode
+        function toggleReviewMode() {
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.remove('hidden');
+            reviewScreen.classList.add('flex');
+
+            const reviewList = document.getElementById('review-list');
+            reviewList.innerHTML = '';
+
+            quizData.forEach((q, idx) => {
+                const userAns = userAnswers[idx];
+                const isCorrect = (userAns === q.correct);
+
+                const card = document.createElement('div');
+                card.className = `glass-card rounded-2xl p-5 border ${isCorrect ? 'border-emerald-500/30 bg-emerald-950/10' : 'border-rose-500/30 bg-rose-950/10'}`;
+
+                let optionsHtml = '';
+                q.options.forEach((opt, oIdx) => {
+                    let optStyle = "text-slate-400";
+                    let badge = "";
+
+                    if (oIdx === q.correct) {
+                        optStyle = "text-emerald-300 font-bold";
+                        badge = `<span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded ml-2">정답</span>`;
+                    }
+                    if (oIdx === userAns && !isCorrect) {
+                        optStyle = "text-rose-300 line-through";
+                        badge = `<span class="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded ml-2">내가 선택한 오답</span>`;
+                    }
+
+                    optionsHtml += `
+                        <div class="text-xs sm:text-sm py-1 flex items-center ${optStyle}">
+                            <span class="w-5 font-mono">${oIdx + 1}.</span>
+                            <span>${opt}</span>
+                            ${badge}
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2 gap-2">
+                        <span class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-2.5 py-1 rounded-full border border-indigo-500/20">
+                            ${q.category}
+                        </span>
+                        <span class="text-xs font-bold flex items-center gap-1 ${isCorrect ? 'text-emerald-400' : 'text-rose-400'}">
+                            ${isCorrect ? '<i data-lucide="check-circle" class="w-4 h-4"></i> 정답' : '<i data-lucide="x-circle" class="w-4 h-4"></i> 오답'}
+                        </span>
+                    </div>
+                    <h4 class="font-bold text-sm sm:text-base text-slate-100 mb-3">
+                        Q${idx + 1}. ${q.question}
+                    </h4>
+                    <div class="bg-slate-900/60 p-3 rounded-xl mb-3 space-y-1 border border-slate-800">
+                        ${optionsHtml}
+                    </div>
+                    <div class="text-xs text-slate-300 bg-slate-900/80 p-3 rounded-xl border border-slate-800 leading-relaxed">
+                        <strong class="text-indigo-300 block mb-1">💡 해설:</strong>
+                        ${q.explanation}
+                    </div>
+                `;
+                reviewList.appendChild(card);
+            });
+
+            lucide.createIcons();
+        }
+
+        // Back to Result Screen
+        function backToResult() {
+            reviewScreen.classList.add('hidden');
+            reviewScreen.classList.remove('flex');
+            resultScreen.classList.remove('hidden');
+        }
+
+        // Confetti Effect for High Scores
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            }
+        }
+    </script>
 </body>
 </html>
